@@ -9,9 +9,16 @@ Image::Rgb::Rgb(float _r, float _g, float _b) : r(_r), g(_g), b(_b) {}
 bool Image::Rgb::operator!=(const Image::Rgb &c) const {
   return c.r != this->r || c.g != this->g || c.b != this->b;
 }
+
 Image::Rgb &Image::Rgb::operator*=(const Image::Rgb &rgb) {
   this->r *= rgb.r, this->g *= rgb.g, this->b *= rgb.b;
   return *this;
+}
+
+Image::Rgb Image::Rgb::operator*(const Image::Rgb &rgb) const{
+    Image::Rgb temp(this->r, this->g, this->b);
+    temp.r *= rgb.r, temp.g *= rgb.g, temp.b *= rgb.b;
+    return temp;
 }
 
 Image::Rgb Image::Rgb::operator+(const Image::Rgb &rgb) {
@@ -52,6 +59,38 @@ const Image::Rgb &Image::operator[](const unsigned int &i) const {
 }
 
 Image::Rgb &Image::operator[](const unsigned int &i) { return pixels[i]; }
+
+Image::Rgb Image::operator()(int column, int row) const
+{
+    return pixels[row*w + column]; 
+}
+
+Image::Rgb &Image::operator()(int column, int row)
+{
+    return pixels[row*w + column]; 
+}
+
+unsigned int Image::getWidth()
+{
+    return w;
+}
+
+unsigned int Image::getHeight()
+{
+    return h;
+}
+
+bool Image::pixelInView(int column, int row)
+{
+    if (column >= w || column < 0 || row >= h || row < 0)
+    {
+        return false;
+    } 
+    else
+    {
+        return true;
+    }
+}
 
 Image::~Image() {
   if (pixels != NULL)
