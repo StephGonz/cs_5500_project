@@ -21,6 +21,7 @@ public:
         bool operator != (const Rgb &c) const;
         Rgb& operator *= (const Rgb &rgb);
         Rgb& operator += (const Rgb &rgb);
+        Rgb operator+(const Image::Rgb &rgb);
         friend float& operator += (float &f, const Rgb rgb); 
     }; 
 
