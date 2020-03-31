@@ -10,19 +10,19 @@ class Image
 { 
 public: 
     // Rgb structure, i.e. a pixel 
-    struct Rgb 
+    struct Rgb
     { 
         float r;
         float g;
         float b;
         Rgb();
-        Rgb(float c); 
-        Rgb(float _r, float _g, float _b); 
+        Rgb(float c);
+        Rgb(float _r, float _g, float _b);
         bool operator != (const Rgb &c) const;
         Rgb& operator *= (const Rgb &rgb);
         Rgb& operator += (const Rgb &rgb);
         Rgb operator+(const Image::Rgb &rgb);
-        friend float& operator += (float &f, const Rgb rgb); 
+        friend float& operator += (float &f, const Rgb rgb);
     }; 
 
     unsigned int w, h; // Image resolution 
@@ -33,6 +33,15 @@ public:
     Image(const unsigned int &_w, const unsigned int &_h, const Rgb &c = Image::kBlack);
     const Rgb& operator [] (const unsigned int &i) const;
     Rgb& operator [] (const unsigned int &i);
+    // ======================================================================
+    // ======================================================================
+    Rgb operator()(int column, int row) const;
+    Rgb& operator()(int column, int row);
+    unsigned int getWidth();
+    unsigned int getHeight();
+    bool pixelInView(int column, int row);
+    // ======================================================================
+    // ======================================================================
     ~Image();
 };
  
