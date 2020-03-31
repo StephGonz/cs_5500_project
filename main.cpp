@@ -6,7 +6,7 @@
 int main(int argc, char **argv)
 {
     /* read test images in */
-    Image cabin = readPPM("cabin.ppm");
+    Image cabin = readPPM("./data/cabin.PPM");
     //Image squid = readPPM("squid.ppm");
     //Image tetons = readPPM("tetons.ppm");
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv)
     //Image cabinGreen(cabin, Image::kGreen);
     //Image squidGreen(squid, Image::kGreen);
     //Image tetonsGreen(tetons, Image::kGreen);
-    
+
     /* blue images */
     //Image cabinBlue(cabin, Image::kBlue);
     //Image squidBlue(squid, Image::kBlue);
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     //savePPM(squid, "squidGray.ppm");
     //savePPM(tetons, "tetonsGray.ppm");
 
-    savePPM(cabinRed, "cabinRed.ppm");
+    savePPM(cabinRed, "./output/cabinRed.PPM");
     //savePPM(squidRed, "squidRed.ppm");
     //savePPM(tetonsRed, "tetonsRed.ppm");
 
