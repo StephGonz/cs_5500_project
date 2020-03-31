@@ -1,10 +1,9 @@
 #include "Convolution.hpp"
-#include "Image.hpp"
 #include <cmath>
 #include <vector>
 
 namespace {
-genDeltas(size_t size) {
+std::vector<int> genDeltas(size_t size) {
   if (size % 2 != 1) {
     throw std::runtime_error("size of filter needs to be odd");
   }
@@ -29,25 +28,25 @@ Image convolve(const Image &img, const Image &filter) {
   }
 }
 
-Rgb convolve(int row, int col, const Image &img, const Image &filter) {
+Image::Rgb convolve(int row, int col, const Image &img, const Image &filter) {
   if (filter.getWidth() != filter.getHeight()) {
     throw std::runtime_error("filter needs to have square dimensions");
   }
 
-  Rgb result;
+  Image::Rgb result;
   std::vector<int> deltas = genDeltas(filter.getWidth());
   for (int dc : deltas) {
     for (int dr : deltas) {
       if (dr || dc) {
-        result += getImageValue(row + dr, col + dc, img) *
-                  filter(dc + filter.size(), dr + filter.size());
+        result += getImageValue(row + dr, col + dc, ApronStyle::ZERO, img) *
+                  filter(dc + filter.getWidth(), dr + filter.getWidth());
       }
     }
   }
   return result;
 }
 
-double getImageValue(int col, int row, ApronStyle apron, Image img) {
+Image::Rgb getImageValue(int col, int row, ApronStyle apron, const Image &img) {
   if (img.pixelInView(col, row)) {
     return img(col, row);
   } else if (apron == ApronStyle::ZERO) {

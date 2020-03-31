@@ -36,9 +36,9 @@ public:
     Rgb& operator [] (const unsigned int &i);
     Rgb operator ()(int column, int row) const;
     Rgb& operator ()(int column, int row);
-    unsigned int getWidth();
-    unsigned int getHeight();
-    bool pixelInView(int column, int row);
+    unsigned int getWidth() const;
+    unsigned int getHeight() const;
+    bool pixelInView(int column, int row) const;
     ~Image();
 };
 

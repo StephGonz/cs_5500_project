@@ -70,26 +70,16 @@ Image::Rgb &Image::operator()(int column, int row)
     return pixels[row*w + column]; 
 }
 
-unsigned int Image::getWidth()
-{
-    return w;
-}
+unsigned int Image::getWidth() const { return w; }
 
-unsigned int Image::getHeight()
-{
-    return h;
-}
+unsigned int Image::getHeight() const { return h; }
 
-bool Image::pixelInView(int column, int row)
-{
-    if (column >= w || column < 0 || row >= h || row < 0)
-    {
-        return false;
-    } 
-    else
-    {
-        return true;
-    }
+bool Image::pixelInView(int column, int row) const {
+  if (column >= w || column < 0 || row >= h || row < 0) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 Image::~Image() {
