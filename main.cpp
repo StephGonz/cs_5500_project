@@ -1,96 +1,99 @@
+#include <chrono>
 #include <iostream>
+#include <mpi.h>
 #include <string>
+#include <time.h>
+#include <vector>
 
 #include "Convolution.hpp"
 #include "Image.hpp"
 
-int main(int argc, char **argv)
-{
-    /* read test images in */
-    //Image cabin = readPPM("./data/cabin.PPM");
-    Image squid = readPPM("./data/squid.PPM");
-    //Image squid2 = readPPM("./data/squid.PPM");
-    //Image tetons = readPPM("tetons.ppm");
+using namespace std;
+#define MCW MPI_COMM_WORLD
 
-    //Image::Rgb s2 = squid2(10, 10);
-    //std::cout << "regular squid pix @ 10, 10: " << s2.r << s2.g << s2.b << std::endl;
+int main(int argc, char **argv) {
+  int rank, size;
+  int data;
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MCW, &rank);
+  MPI_Comm_size(MCW, &size);
 
-    /* gray scale images */
-    //grayScale(cabin);
-    grayScale(squid);
+  auto start = std::chrono::high_resolution_clock::now();
 
-    Image filter(3, 3);
+  Image squid = readPPM("./data/squid.PPM");
+  int width = squid.getWidth();
+  int height = squid.getHeight();
 
-    filter(0, 0) = Image::Rgb(-1);
-    filter(1, 0) = Image::Rgb(-2);
-    filter(2, 0) = Image::Rgb(-1);
+  int numRows = height / size;
+  if (rank < static_cast<int>(height) % size) {
+    ++numRows;
+  }
 
-    filter(0, 1) = Image::Rgb(0);
-    filter(1, 1) = Image::Rgb(0);
-    filter(2, 1) = Image::Rgb(0);
+  grayScale(squid);
 
-    filter(0, 2) = Image::Rgb(-1);
-    filter(1, 2) = Image::Rgb(-2);
-    filter(2, 2) = Image::Rgb(-1);
+  Image filter(1, 1);
+  filter(0, 0) = Image::COLORS[rank % Image::COLORS.size()];
 
-    // filter(0, 0) = Image::Rgb(0);
-    // filter(1, 0) = Image::Rgb(0);
-    // filter(2, 0) = Image::Rgb(0);
+  auto startRow = 0;
+  for (int i = rank; i > 0; --i) {
+    int tempRows = height / size;
+    if (i - 1 < static_cast<int>(height) % size) {
+      ++tempRows;
+    }
 
-    // filter(0, 1) = Image::Rgb(0);
-    // filter(1, 1) = Image::Rgb(1);
-    // filter(2, 1) = Image::Rgb(0);
+    startRow += tempRows;
+  }
 
-    // filter(0, 2) = Image::Rgb(0);
-    // filter(1, 2) = Image::Rgb(0);
-    // filter(2, 2) = Image::Rgb(0);
+  Image finalImage(width, height);
+  Image myWork(width, numRows);
+  if (rank == 0) {
+  } else {
+  }
 
-    savePPM(squid, "./output/startingSquid.ppm");
+  for (int row = 0; row < numRows; ++row) {
+    for (int col = 0; col < width; ++col) {
+      // do work
+      if (rank == 0) {
+        finalImage(col, row) = convolve(col, row + startRow, squid, filter);
+      } else {
+        myWork(col, row) = convolve(col, row + startRow, squid, filter);
+      }
+    }
+  }
 
-    auto result = convolve(squid, filter);
+  if (rank == 0) {
+    // Recieve data
+    int tempRows = 0;
+    for (int i = 0; i < size - 1; ++i) {
+      tempRows += height / size;
+      if (i < static_cast<int>(height) % size) {
+        ++tempRows;
+      }
 
-    savePPM(result, "./output/convSquid.ppm");
+      int dataSize = height / size;
+      if (i + 1 < static_cast<int>(height) % size) {
+        ++dataSize;
+      }
 
-    //Image::Rgb s1 = squid(10, 10);
-    //squid2(10, 10) = squid(10, 10);
-    //squid2(10, 10).r = 99.9;
-    //s2 = squid2(10, 10);
-    //std::cout << "regular squid pix @ 10, 10: " << s2.r << s2.g << s2.b << std::endl;
-    //std::cout << "grey squid pix @ 10, 10: " << s1.r << s1.g << s1.b << std::endl;
-    //grayScale(tetons);
+      MPI_Recv(&finalImage.pixels[tempRows * width], dataSize * width * 3,
+               MPI_FLOAT, i + 1, 0, MCW, MPI_STATUS_IGNORE);
+    }
 
-    /* red images */
-    //Image cabinRed(cabin, Image::kRed);
-    //Image squidRed(squid, Image::kRed);
-    //Image tetonsRed(tetons, Image::kRed);
+    savePPM(finalImage, "./output/finalImage.ppm");
 
-    /* green images */
-    //Image cabinGreen(cabin, Image::kGreen);
-    //Image squidGreen(squid, Image::kGreen);
-    //Image tetonsGreen(tetons, Image::kGreen);
+  } else {
+    // Send data to thread 0
+    MPI_Send(&myWork.pixels[0], numRows * width * 3, MPI_FLOAT, 0, 0, MCW);
+  }
 
-    /* blue images */
-    //Image cabinBlue(cabin, Image::kBlue);
-    //Image squidBlue(squid, Image::kBlue);
-    //Image tetonsBlue(tetons, Image::kBlue);
+  MPI_Finalize();
 
+  if (rank == 0) {
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    printf("Duration: %li\n", duration.count());
+  }
 
-    /* save the images*/
-    //savePPM(cabin, "cabinGray.ppm");
-    //savePPM(squid, "squidGray.ppm");
-    //savePPM(tetons, "tetonsGray.ppm");
-
-    //savePPM(cabinRed, "./output/cabinRed.PPM");
-    //savePPM(squidRed, "squidRed.ppm");
-    //savePPM(tetonsRed, "tetonsRed.ppm");
-
-    //savePPM(cabinGreen, "cabinGreen.ppm");
-    //savePPM(squidGreen, "squidGreen.ppm");
-    //savePPM(tetonsGreen, "tetonsGreen.ppm");
-
-    //savePPM(cabinBlue, "cabinBlue.ppm");
-    //savePPM(squidBlue, "squidBlue.ppm");
-    //savePPM(tetonsBlue, "tetonsBlue.ppm");
-
-    return 0;
+  return 0;
 }

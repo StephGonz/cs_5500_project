@@ -101,6 +101,7 @@ const Image::Rgb Image::kWhite = Image::Rgb(1);
 const Image::Rgb Image::kRed = Image::Rgb(1, 0, 0);
 const Image::Rgb Image::kGreen = Image::Rgb(0, 1, 0);
 const Image::Rgb Image::kBlue = Image::Rgb(0, 0, 1);
+const std::vector<Image::Rgb> Image::COLORS{kRed, kGreen, kBlue};
 
 Image readPPM(const char *filename) {
   std::ifstream ifs;

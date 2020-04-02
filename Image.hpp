@@ -1,6 +1,7 @@
 #include <cstdlib> 
 #include <cstdio> 
 #include <fstream>
+#include <vector>
 #include <string.h>
 
 #ifndef IMAGE_HPP
@@ -29,6 +30,7 @@ public:
     unsigned int w, h; // Image resolution
     Rgb *pixels; // 1D array of pixels
     static const Rgb kBlack, kWhite, kRed, kGreen, kBlue; // Preset colors
+    static const std::vector<Rgb> COLORS;
     Image();
     Image(const Image &img);
     Image(const Image &img, const Rgb &c);
