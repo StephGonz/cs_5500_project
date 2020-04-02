@@ -3,14 +3,14 @@
 #include <vector>
 
 namespace {
-std::vector<int> genDeltas(size_t size) {
+std::vector<int> genDeltas(int size) {
   if (size % 2 != 1) {
     throw std::runtime_error("size of filter needs to be odd");
   }
 
   std::vector<int> deltas;
 
-  for (size_t delta = -(size / 2); delta <= size / 2; ++delta) {
+  for (int delta = -(size / 2); delta <= size / 2; ++delta) {
     deltas.push_back(delta);
   }
 
@@ -23,12 +23,14 @@ Image convolve(const Image &img, const Image &filter) {
 
   for (unsigned int row = 0; row < img.getHeight(); ++row) {
     for (unsigned int col = 0; col < img.getWidth(); ++col) {
-      newImage(row, col) = convolve(row, col, img, filter);
+      newImage(col, row) = convolve(col, row, img, filter);
     }
   }
+
+  return newImage;
 }
 
-Image::Rgb convolve(int row, int col, const Image &img, const Image &filter) {
+Image::Rgb convolve(int col, int row, const Image &img, const Image &filter) {
   if (filter.getWidth() != filter.getHeight()) {
     throw std::runtime_error("filter needs to have square dimensions");
   }
@@ -37,12 +39,13 @@ Image::Rgb convolve(int row, int col, const Image &img, const Image &filter) {
   std::vector<int> deltas = genDeltas(filter.getWidth());
   for (int dc : deltas) {
     for (int dr : deltas) {
-      if (dr || dc) {
-        result += getImageValue(row + dr, col + dc, ApronStyle::ZERO, img) *
-                  filter(dc + filter.getWidth(), dr + filter.getWidth());
-      }
+      auto filterVal =
+          filter(dc + filter.getWidth() / 2, dr + filter.getWidth() / 2);
+      auto imgVal = getImageValue(col + dc, row + dr, ApronStyle::EXTEND, img);
+      result += imgVal * filterVal;
     }
   }
+
   return result;
 }
 

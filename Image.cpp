@@ -39,6 +39,13 @@ float &operator+=(float &f, const Image::Rgb rgb) {
 Image::Image() : w(0), h(0), pixels(nullptr) { /* empty image */
 }
 
+Image::Image(const Image &img) : w(img.w), h(img.h) {
+  pixels = new Rgb[w * h];
+  for (int i = 0; i < w * h; ++i) {
+    pixels[i] = img.pixels[i];
+  }
+}
+
 Image::Image(const Image &img, const Image::Rgb &c) : w(img.w), h(img.h) {
   pixels = new Rgb[w * h];
   for (int i = 0; i < w * h; ++i) {
@@ -75,7 +82,9 @@ unsigned int Image::getWidth() const { return w; }
 unsigned int Image::getHeight() const { return h; }
 
 bool Image::pixelInView(int column, int row) const {
-  if (column >= w || column < 0 || row >= h || row < 0) {
+  if (column < 0 || row < 0) {
+    return false;
+  } else if (column >= w || row >= h) {
     return false;
   } else {
     return true;
@@ -83,8 +92,8 @@ bool Image::pixelInView(int column, int row) const {
 }
 
 Image::~Image() {
-  if (pixels != NULL)
-    delete[] pixels;
+  // if (pixels != NULL)
+  // delete[] pixels;
 }
 
 const Image::Rgb Image::kBlack = Image::Rgb(0);

@@ -1,13 +1,14 @@
 #include <iostream>
 #include <string>
 
+#include "Convolution.hpp"
 #include "Image.hpp"
 
 int main(int argc, char **argv)
 {
     /* read test images in */
     //Image cabin = readPPM("./data/cabin.PPM");
-    //Image squid = readPPM("./data/squid.PPM");
+    Image squid = readPPM("./data/squid.PPM");
     //Image squid2 = readPPM("./data/squid.PPM");
     //Image tetons = readPPM("tetons.ppm");
 
@@ -16,7 +17,39 @@ int main(int argc, char **argv)
 
     /* gray scale images */
     //grayScale(cabin);
-    //grayScale(squid);
+    grayScale(squid);
+
+    Image filter(3, 3);
+
+    filter(0, 0) = Image::Rgb(-1);
+    filter(1, 0) = Image::Rgb(-2);
+    filter(2, 0) = Image::Rgb(-1);
+
+    filter(0, 1) = Image::Rgb(0);
+    filter(1, 1) = Image::Rgb(0);
+    filter(2, 1) = Image::Rgb(0);
+
+    filter(0, 2) = Image::Rgb(-1);
+    filter(1, 2) = Image::Rgb(-2);
+    filter(2, 2) = Image::Rgb(-1);
+
+    // filter(0, 0) = Image::Rgb(0);
+    // filter(1, 0) = Image::Rgb(0);
+    // filter(2, 0) = Image::Rgb(0);
+
+    // filter(0, 1) = Image::Rgb(0);
+    // filter(1, 1) = Image::Rgb(1);
+    // filter(2, 1) = Image::Rgb(0);
+
+    // filter(0, 2) = Image::Rgb(0);
+    // filter(1, 2) = Image::Rgb(0);
+    // filter(2, 2) = Image::Rgb(0);
+
+    savePPM(squid, "./output/startingSquid.ppm");
+
+    auto result = convolve(squid, filter);
+
+    savePPM(result, "./output/convSquid.ppm");
 
     //Image::Rgb s1 = squid(10, 10);
     //squid2(10, 10) = squid(10, 10);

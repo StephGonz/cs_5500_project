@@ -29,13 +29,15 @@ public:
     unsigned int w, h; // Image resolution
     Rgb *pixels; // 1D array of pixels
     static const Rgb kBlack, kWhite, kRed, kGreen, kBlue; // Preset colors
-    Image(); 
-    Image(const Image &img, const Rgb &c = Image::kBlack);
-    Image(const unsigned int &_w, const unsigned int &_h, const Rgb &c = Image::kBlack);
-    const Rgb& operator [] (const unsigned int &i) const;
-    Rgb& operator [] (const unsigned int &i);
-    Rgb operator ()(int column, int row) const;
-    Rgb& operator ()(int column, int row);
+    Image();
+    Image(const Image &img);
+    Image(const Image &img, const Rgb &c);
+    Image(const unsigned int &_w, const unsigned int &_h,
+          const Rgb &c = Image::kBlack);
+    const Rgb &operator[](const unsigned int &i) const;
+    Rgb &operator[](const unsigned int &i);
+    Rgb operator()(int column, int row) const;
+    Rgb &operator()(int column, int row);
     unsigned int getWidth() const;
     unsigned int getHeight() const;
     bool pixelInView(int column, int row) const;
