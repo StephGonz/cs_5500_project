@@ -31,19 +31,8 @@ int main(int argc, char **argv) {
 
   grayScale(squid);
 
-  Image filter(3, 3);
-
-  filter(0, 0) = Image::Rgb(-1);
-  filter(1, 0) = Image::Rgb(-2);
-  filter(2, 0) = Image::Rgb(-1);
-
-  filter(0, 1) = Image::Rgb(0);
-  filter(1, 1) = Image::Rgb(0);
-  filter(2, 1) = Image::Rgb(0);
-
-  filter(0, 2) = Image::Rgb(-1);
-  filter(1, 2) = Image::Rgb(-2);
-  filter(2, 2) = Image::Rgb(-1);
+  Image filter(1, 1);
+  filter(0, 0) = Image::COLORS[rank % Image::COLORS.size()];
 
   auto startRow = 0;
   for (int i = rank; i > 0; --i) {
