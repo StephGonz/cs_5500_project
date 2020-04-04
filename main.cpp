@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Convolution.hpp"
+#include "Filter.hpp"
 #include "Image.hpp"
 
 using namespace std;
@@ -14,25 +15,71 @@ using namespace std;
 int main(int argc, char **argv) {
   int rank, size;
   int data;
+  int filterNum;
+  int imageNum;
+  int err;
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MCW, &rank);
   MPI_Comm_size(MCW, &size);
 
+  if(rank == 0)
+  {
+    if(argc != 3)
+    {
+      std::cout << "Two arguments are expected to run this program" << std::endl;
+      std::cout << "Arg 1 = number representing the image to use" << std::endl;
+      std::cout << "Image Numbers\n1 : Cabin\t 2 : Squid\t 3 : Tetons" << std::endl;
+      std::cout << "Arg 2 = number representing the filter to use" << std::endl;
+      std::cout << "Filter Numbers\n1 : Scharr\t 2 : Sobel\t 3 : Gaussian" << std::endl;
+      std::cout << "4 : Rainbow\t 5 : Unsharp\t 6 : All" << std::endl;
+      std::cout << "Examples:\nCabin with Scharr filter\tmpirun -np 4 a.out 1 1" << std::endl;
+      std::cout << "Squid with Rainbow filter\tmpirun -np 4 a.out 2 4" << std::endl;
+      std::cout << "Tetons with Sobel filter\tmpirun -np 4 a.out 3 2" << std::endl;
+      MPI_Abort(MCW, err);
+    }
+    else
+    {
+      imageNum = atof(argv[1]);
+      filterNum = atof(argv[2]);
+      if(imageNum < 1 || filterNum < 1) {
+        std::cout << "Invalid parameters entered.\nArg 1 acceptable range 1 : 3\nArg 2 acceptable range 1 : 6" << std::endl;
+        MPI_Abort(MCW, err);
+      }
+      if(imageNum > 3 || filterNum > 6) {
+        std::cout << "Invalid parameters entered.\nArg 1 acceptable range 1 : 3\nArg 2 acceptable range 1 : 6" << std::endl;
+        MPI_Abort(MCW, err);        
+      }
+    }
+  }
+
+  MPI_Barrier(MCW);
+
+  imageNum = atof(argv[1]);
+  filterNum = atof(argv[2]);
+
   auto start = std::chrono::high_resolution_clock::now();
 
-  Image squid = readPPM("./data/squid.PPM");
-  int width = squid.getWidth();
-  int height = squid.getHeight();
+  Image img;
+  if(imageNum == 1) {
+    img = readPPM("./data/cabin.PPM");
+  } else if(imageNum == 2) {
+    img = readPPM("./data/squid.PPM");
+  } else {
+    img = readPPM("./data/tetons.PPM");
+  }
+
+  int width = img.getWidth();
+  int height = img.getHeight();
 
   int numRows = height / size;
   if (rank < static_cast<int>(height) % size) {
     ++numRows;
   }
 
-  grayScale(squid);
+  grayScale(img);
 
-  Image filter(1, 1);
-  filter(0, 0) = Image::COLORS[rank % Image::COLORS.size()];
+
+  Image filter = filters::getFilter(filterNum, rank);
 
   auto startRow = 0;
   for (int i = rank; i > 0; --i) {
@@ -54,9 +101,9 @@ int main(int argc, char **argv) {
     for (int col = 0; col < width; ++col) {
       // do work
       if (rank == 0) {
-        finalImage(col, row) = convolve(col, row + startRow, squid, filter);
+        finalImage(col, row) = convolve(col, row + startRow, img, filter);
       } else {
-        myWork(col, row) = convolve(col, row + startRow, squid, filter);
+        myWork(col, row) = convolve(col, row + startRow, img, filter);
       }
     }
   }

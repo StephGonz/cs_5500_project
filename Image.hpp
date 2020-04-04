@@ -29,7 +29,7 @@ public:
 
     unsigned int w, h; // Image resolution
     Rgb *pixels; // 1D array of pixels
-    static const Rgb kBlack, kWhite, kRed, kGreen, kBlue; // Preset colors
+    static const Rgb kBlack, kWhite, kRed, kGreen, kBlue, kOrange, kPurple, kYellow; // Preset colors
     static const std::vector<Rgb> COLORS;
     Image();
     Image(const Image &img);
