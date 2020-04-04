@@ -1,11 +1,21 @@
 # cs_5500_project
 
 To Compile:
-g++ main.cpp image.cpp -o main -std=c++14
+mpic++ main.cpp Convolution.cpp Filter.cpp Image.cpp
 
 To Run:
-In main you can specify the manipulation that you would like to use on the data. 
-Right now, you can only save one image at a time or the program has problems and leaves 
-empty images. 
-Output:
-I left some images that have been manipulated as examples
+mpirun -np [number of processes] a.out [image number range 1:3] [filter number range 1:6] 
+
+Image Numers
+  1: cabin.PPM
+  2: squid.PPM
+  3. tetons.PPM
+  
+Filter Numbers
+  1: Scharr
+  2: Sobel
+  3: Gaussian
+  4: Rainbow
+  5: Sharpen
+  6: All Filters
+  
